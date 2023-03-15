@@ -54,6 +54,7 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 	}
 	
 	// Try a sensible default
+	console.log("Try an initial approximation")
 	let x0_init = [ 50, 50 ] 
 	let nelderMead_init = nelderMead(loss, x0_init);
 	let result_init = [nelderMead_init.x[0], nelderMead_init.x[1]]
@@ -66,6 +67,7 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 	
 	// if the sensible default doesn't work,
 	// try a grid search
+	console.log("Initial approximation did not converge, trying a grid search")
 	let min_loss = Infinity
 	let result = null
 	for(let a=1; a<40; a=a+2){
@@ -86,6 +88,31 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 			}
 		}
 	}
+	if(loss < 10e-6){
+		return result
+	}
+
+	// try a more hardcore grid search
+	console.log("Initial grid search did not converge, trying a more hardcore grid search")
+	for(let a=1; a<1000; a=a+0.1){
+		for(let b=1; b<1000; b=b+0.1){
+			let x0 = [ a, b ]
+			
+			let nelderMead_output = nelderMead(loss, x0);
+			let new_result = [nelderMead_output.x[0], nelderMead_output.x[1]]
+			let new_loss = loss(new_result)
+
+			if(loss < 10e-8){
+				return new_result
+			}
+
+			if(new_loss < min_loss){
+				min_loss = new_loss
+				result = new_result 
+			}
+		}
+	}
+
 	// console.log(min_loss)
 	return result 
 	
