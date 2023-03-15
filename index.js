@@ -16,58 +16,93 @@ console.log(beta_cdf({x: 0.1, a: 1.0, b:25.0}))
 
 const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 
-	const f_to_minimize = (a,b) => {
-		let loss_ci_lower = (beta_cdf({x: ci_lower, a, b}) - 0.05)**2 
-		let loss_ci_upper = (beta_cdf({x: ci_upper, a, b}) - 0.95)**2
-		console.l
-		let loss = loss_ci_lower + loss_ci_upper
-		// console.log(`loss: ${loss}`)
-		return loss
+	const loss = (a,b) => {
+		// let loss_ci_lower = (beta_cdf({x: ci_lower, a, b}) - 0.05)**2 
+		// let loss_ci_upper = (beta_cdf({x: ci_upper, a, b}) - 0.95)**2
+		let loss_ci_lower = Math.abs(beta_cdf({x: ci_lower, a, b}) - 0.05)
+		let loss_ci_upper = Math.abs(beta_cdf({x: ci_upper, a, b}) - 0.95)
+		// the advantage of the Math.abs is that it has a clearer interpretation
+		// (within x digits of the result)
+		// and that it doesn't become very small very soon
+		// the disadvantages is that it's slightly less differentiable
+		let result = loss_ci_lower + loss_ci_upper
+		// let result = Math.max(loss_ci_lower, loss_ci_upper)
+		// console.log(`loss: ${result}`)
+		return result
 	}
 	
-	const h = 2**(-14)
+	const h =0.0001
 	const df_da = (a,b) => { // derivative of f with respect to a, at (a,b)
-		let f_h = f_to_minimize(a + h, b)
-		let f = f_to_minimize(a,b)
+		let f_h = loss(a + h, b)
+		let f = loss(a,b)
 		let result = (f_h - f)/h
 		return result
 	}
 	const df_db = (a,b) => { // derivative of f with respect to b, at (a,b)
-		let f_h = f_to_minimize(a, b)
-		let f = f_to_minimize(a, b+h)
+		let f_h = loss(a, b)
+		let f = loss(a, b+h)
 		let result = (f_h - f)/h
 		return result
 	}
 
 	// gradient descent step
-	let epsilon = 2**(-14) // 1/16384
-	let n_a = 2
-	let n_b = 2
-	let a = 2.5
-	let b = 3
-	let max_steps = 1000 * 1000
-	for(let i = 0; i<max_steps; i++){
-		// gradient step for a
-		let dir_a = - df_da(a,b)
-		let stepsize_a = 0.001 // 1/n_a 
-		let step_a = stepsize_a * dir_a 
-		a = Math.max(a + step_a, 0)
-		n_a = n_a + 1
+	const gradient_descent = (a_init,b_init) => {
+		let epsilon = 2**(-14) // 1/16384
+		let n_a = 2
+		let n_b = 2
+		let a = a_init 
+		let b = b_init
+		let max_steps =  2000
+		for(let i = 0; i<max_steps; i++){
+			// gradient step for a
+			let dir_a = - df_da(a,b)
+			let stepsize_a = 0.0005 // 1/n_a 
+			let step_a = stepsize_a * dir_a 
+			a = Math.max(a + step_a, 0)
+			n_a = n_a + 1
 
-		// gradient step for b
-		let dir_b = - df_db(a,b)
-		let stepsize_b = 0.001 // 1/n_b
-		let step_b = stepsize_b * dir_b
-		b = Math.max(b + step_b,0)
-		n_b = n_b + 1
-		// console.log(`a: ${a}, b: ${b}`)
+			// gradient step for b
+			let dir_b = - df_db(a,b)
+			let stepsize_b = 0.0005 // 1/n_b
+			let step_b = stepsize_b * dir_b
+			b = Math.max(b + step_b,0)
+			n_b = n_b + 1
+			// console.log(`a: ${a}, b: ${b}`)
+		}
+		return [a, b]
 	}
-	return [a, b]
+
+	// Do the gradient step for 10 random starting points.
+	let num_initializations = 30
+	let best_loss = Infinity
+	let best_result = null
+	// for(let i=0; i<num_initializations; i++){
+	while(best_loss > 0.001){
+		let a_init = Math.random() * 5
+		let b_init = Math.random() * 5
+		let new_result = gradient_descent(a_init, b_init)
+		let new_loss = loss(new_result[0], new_result[1])
+		if( new_loss < best_loss){
+			console.log(`new best loss: ${new_loss}`)
+			// let [a,b] = new_result
+			// console.log(beta_cdf({x: ci_lower, a, b}))
+			// console.log(beta_cdf({x: ci_upper, a, b}))
+			console.log(new_result)
+			best_loss = new_loss
+			best_result = new_result
+		}
+	}
+	//}
+	console.log(best_loss)
+	return best_result
 }
 
 let ci_lower = 0.2
 let ci_upper = 0.9
 
-let result = find_beta_from_ci({ci_lower, ci_upper})
-console.log(result)
-console.log(`beta(${result[0]}, ${result[1]})`)
+let [a, b] = find_beta_from_ci({ci_lower, ci_upper})
+console.log([a,b])
+console.log(`beta(${a}, ${b})`)
+
+console.log(beta_cdf({x: ci_lower, a, b}))
+console.log(beta_cdf({x: ci_upper, a, b}))
