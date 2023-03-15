@@ -53,15 +53,17 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 		return [df_da, df_db]
 	}
 	
+	// point at which to give up
+	let target_loss = 10e-8
 	// Try a sensible default
 	console.log("Try an initial approximation")
 	let x0_init = [ 50, 50 ] 
 	let nelderMead_init = nelderMead(loss, x0_init);
 	let result_init = [nelderMead_init.x[0], nelderMead_init.x[1]]
 	let loss_init = loss(result_init)
-	// console.log(loss_init)
+	console.log(`Initial loss: ${loss_init}`)
 
-	if(loss < 10e-8){
+	if(loss_init < target_loss){
 		return result_init
 	}
 	
@@ -78,7 +80,8 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 			let new_result = [nelderMead_output.x[0], nelderMead_output.x[1]]
 			let new_loss = loss(new_result)
 
-			if(loss < 10e-8){
+			if(new_loss < target_loss){
+				console.log(new_loss)
 				return new_result
 			}
 
@@ -88,7 +91,8 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 			}
 		}
 	}
-	if(loss < 10e-6){
+	console.log(`Initial grid loss: ${loss_init}`)
+	if(min_loss < target_loss){
 		return result
 	}
 
@@ -102,7 +106,8 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 			let new_result = [nelderMead_output.x[0], nelderMead_output.x[1]]
 			let new_loss = loss(new_result)
 
-			if(loss < 10e-8){
+			if(new_loss < target_loss){
+				console.log(new_loss)
 				return new_result
 			}
 
