@@ -1,5 +1,7 @@
-// import * as betainc from '/home/loki/Documents/core/software/fresh/js/beta-ci/node_modules/@stdlib/math/base/special/betainc/lib/index.js'
+// import * as betainc from '/home/loki/Documents/core/sminimize_GradientDescentoftware/fresh/js/beta-ci/node_modules/@stdlib/math/base/special/betainc/lib/index.js'
 import betainc from '@stdlib/math/base/special/betainc/lib/index.js'
+import {minimize_L_BFGS} from "optimization-js/src/optimization.js"
+import {minimize_GradientDescent} from "optimization-js/src/optimization.js"
 
 /*
  * Betainc: Incomplete regularized 
@@ -16,11 +18,14 @@ console.log(beta_cdf({x: 0.1, a: 1.0, b:25.0}))
 
 const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 
-	const loss = (a,b) => {
+	function loss(x){
+		let a = x[0]
+		let b = x[1] 
 		// let loss_ci_lower = (beta_cdf({x: ci_lower, a, b}) - 0.05)**2 
 		// let loss_ci_upper = (beta_cdf({x: ci_upper, a, b}) - 0.95)**2
-		let loss_ci_lower = Math.abs(beta_cdf({x: ci_lower, a, b}) - 0.05)
-		let loss_ci_upper = Math.abs(beta_cdf({x: ci_upper, a, b}) - 0.95)
+		let smoother = x => x**2 // Math.abs
+		let loss_ci_lower = smoother(beta_cdf({x: ci_lower, a, b}) - 0.05)
+		let loss_ci_upper = smoother(beta_cdf({x: ci_upper, a, b}) - 0.95)
 		// the advantage of the Math.abs is that it has a clearer interpretation
 		// (within x digits of the result)
 		// and that it doesn't become very small very soon
@@ -30,118 +35,39 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 		// console.log(`loss: ${result}`)
 		return result
 	}
-	
+
 	const h =0.0001
-	const df_da = (a,b) => { // derivative of f with respect to a, at (a,b)
-		let f_h = loss(a + h, b)
-		let f = loss(a,b)
-		let result = (f_h - f)/h
-		return result
+	function gradient2(x){
+		let a = x[0]
+		let b = x[1] 
+		let f = loss([a,b])
+		
+		let f_h_a = loss([a + h, b])
+		let f_h_b = loss([a, b+h])
+
+		let df_da = (f_h_a - f)/h
+		let df_db = (f_h_b - f)/h
+
+		return [df_da, df_db]
 	}
-	const df_db = (a,b) => { // derivative of f with respect to b, at (a,b)
-		let f_h = loss(a, b)
-		let f = loss(a, b+h)
-		let result = (f_h - f)/h
-		return result
-	}
+
+	let x0 = [ 4.0, 2.0]
+	// let result = minimize_L_BFGS(objective, gradient, x0)
+	let result = minimize_L_BFGS(loss, gradient2, x0)
+	// let result2 = minimize_GradientDescent(loss, gradient, x0)
+	console.log(loss(result.argument))
+	return result
 	
-	// backtracking line search
-	// <https://en.wikipedia.org/wiki/Backtracking_line_search>
-	// Once we know the direction, how far to go along it?
-	let outer_step_size_max = 1
-	let n_backtracking = 20
-	let local_minima_indicator = 2 * outer_step_size_max * (1/(2**n_backtracking))
-	const get_optimal_step_size_a = ({a,b, dir, is_a}) => {
-		
-		let step_size_min = 0
-		let loss_s_min = is_a ? loss(a + step_size_min * dir, b) : loss(a, b + step_size_min * dir)
-		
-		let step_size_max = outer_step_size_max
-		let loss_s_max = is_a ? loss(a + step_size_max * dir, b) : loss(a, b + step_size_max * dir)
-
-
-		for(let i=0; i<n_backtracking; i++){
-			if(loss_s_min < loss_s_max){
-				step_size_max = (step_size_max + step_size_min) / 2
-				loss_s_max = is_a ? loss(a + step_size_max * dir, b) : loss(a, b + step_size_max * dir)
-			}else{
-				step_size_min = (step_size_max + step_size_min) / 2
-				loss_s_min = is_a ? loss(a + step_size_min * dir, b) : loss(a, b + step_size_min * dir)
-			}
-		}
-		return (step_size_min + step_size_max)/2
-	}
-
-	// gradient descent step
-	const gradient_descent = (a_init,b_init) => {
-		let a = a_init 
-		let b = b_init
-		let max_steps =  2000
-		for(let i = 0; i<max_steps; i++){
-			// gradient step for a
-			let dir_a = df_da(a,b) > 0 ? -1 : 1
-			// console.log(dir_a)
-			// let stepsize_a = 0.0005 // 1/n_a 
-			let stepsize_a = get_optimal_step_size_a({a,b, dir: dir_a, is_a: true})
-			let step_a = stepsize_a // * dir_a 
-			a = Math.max(a + step_a, 0)
-
-			// gradient step for b
-			let dir_b = df_db(a,b) > 0 ? -1 : 1
-			// let stepsize_b = 0.0005 // 1/n_b
-			let stepsize_b = get_optimal_step_size_a({a,b, dir: dir_b, is_a: false})
-			let step_b = stepsize_b // * dir_b
-			b = Math.max(b + step_b,0)
-			// console.log(`stepsize_a: ${stepsize_a}, stepsize_b: ${stepsize_b}`)
-			// console.log(`a: ${a}, b: ${b}`)
-			if(stepsize_a + stepsize_b < local_minima_indicator) break;
-		}
-		return [a, b]
-	}
-
-	// Do the gradient step until the loss is low enough
-	let best_loss = Infinity
-	let best_result = null
-	let num_trials = 0 
-	while(best_loss >  0.0045){
-		let a_init = Math.random() * 5
-		let b_init = Math.random() * 5
-		if(num_trials > 40 && best_loss < 0.03){
-			let exploit = Math.random() > 0.5
-			if(exploit){
-				a_init = best_result[0] + Math.random() * 0.1
-				b_init = best_result[0] + Math.random() * 0.1
-			}
-		}
-		let new_result = gradient_descent(a_init, b_init)
-		let new_loss = loss(new_result[0], new_result[1])
-		if( new_loss < best_loss){
-			console.log("New best")
-			console.group()
-				console.log(new_result)
-				console.log(num_trials)
-				console.log(`loss: ${new_loss}`)
-			console.groupEnd()
-			// let [a,b] = new_result
-			// console.log(beta_cdf({x: ci_lower, a, b}))
-			// console.log(beta_cdf({x: ci_upper, a, b}))
-			best_loss = new_loss
-			best_result = new_result
-		}
-		num_trials++
-	}
-	//}
-	console.log(num_trials)
-	console.log(best_loss)
-	return best_result
 }
 
 let ci_lower = 0.1
 let ci_upper = 0.2
 
-let [a, b] = find_beta_from_ci({ci_lower, ci_upper})
-console.log([a,b])
+let result = find_beta_from_ci({ci_lower, ci_upper})
+console.log(result)
+/* console.log([a,b])
 console.log(`beta(${a}, ${b})`)
 
 console.log(beta_cdf({x: ci_lower, a, b}))
 console.log(beta_cdf({x: ci_upper, a, b}))
+*/
