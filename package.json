@@ -1,6 +1,7 @@
 {
 	"type": "module",
-  "dependencies": {
-    "@stdlib/math": "^0.0.11"
-  }
+	"dependencies": {
+		"@stdlib/math": "^0.0.11",
+		"optimization-js": "^1.5.0"
+	}
 }
