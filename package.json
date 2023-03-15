@@ -4,7 +4,7 @@
   "description": "Find a beta distribution which fits a confidence interval",
   "main": "src/index.js",
   "author": "NunoSempere <nuno.sempere@protonmail.com>",
-  "license": "MIT, but see src/nelderMead/LICENSE",
+  "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
     "@stdlib/math-base-special-betainc": "^0.0.6"

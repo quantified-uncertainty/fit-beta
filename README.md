@@ -15,4 +15,6 @@ For the Nelder Mead method, I am using [this implementation](https://github.com/
 
 For various functions, I am using [stdlib](https://stdlib.io/). I tried to extract the core code from them, but sadly they are all fairly intertwined. 
 
-## 
+## Installation
+
+For now, I am not publishing this on npm 
