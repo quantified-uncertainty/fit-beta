@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "@stdlib/math": "^0.0.11"
+    "@stdlib/math-base-special-betainc": "^0.0.6"
   }
 }

@@ -1,5 +1,6 @@
 import {nelderMead} from './nelderMead.js';
-import betainc from '@stdlib/math/base/special/betainc/lib/index.js'
+import betainc from '@stdlib/math-base-special-betainc/lib/index.js'
+
 /*
  * Betainc: Incomplete regularized beta function
  * <https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function>
