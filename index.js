@@ -2,6 +2,7 @@
 import betainc from '@stdlib/math/base/special/betainc/lib/index.js'
 import {minimize_L_BFGS} from "optimization-js/src/optimization.js"
 import {minimize_GradientDescent} from "optimization-js/src/optimization.js"
+import {nelderMead} from 'fmin/src/nelderMead.js';
 
 /*
  * Betainc: Incomplete regularized 
@@ -51,12 +52,16 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 		return [df_da, df_db]
 	}
 
-	let x0 = [ 4.0, 2.0]
+	let x0 = [ 50, 50]
+	/*
 	// let result = minimize_L_BFGS(objective, gradient, x0)
 	let result = minimize_L_BFGS(loss, gradient2, x0)
 	// let result2 = minimize_GradientDescent(loss, gradient, x0)
 	console.log(loss(result.argument))
-	return result
+	*/
+	var solution = nelderMead(loss, [50, 50]);
+	console.log("solution is at " + solution.x);
+	return solution
 	
 }
 
