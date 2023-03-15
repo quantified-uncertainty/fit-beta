@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@stdlib/math-base-special-betainc": "^0.0.6"
   }
