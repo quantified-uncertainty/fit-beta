@@ -48,17 +48,19 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 	// backtracking line search
 	// <https://en.wikipedia.org/wiki/Backtracking_line_search>
 	// Once we know the direction, how far to go along it?
-	const get_optimal_step_size_a = ({a,b, d, is_a}) => {
-		let dir = d_a > 0 ? 1 : -1 
+	let outer_step_size_max = 0.05
+	let n_backtracking = 20
+	let local_minima_indicator = 2 * outer_step_size_max * (1/(2**n_backtracking))
+	const get_optimal_step_size_a = ({a,b, dir, is_a}) => {
 		
 		let step_size_min = 0
 		let loss_s_min = is_a ? loss(a + step_size_min * dir, b) : loss(a, b + step_size_min * dir)
 		
-		let step_size_max = 0.1
+		let step_size_max = outer_step_size_max
 		let loss_s_max = is_a ? loss(a + step_size_max * dir, b) : loss(a, b + step_size_max * dir)
 
 
-		for(let i=0; i<20; i++){
+		for(let i=0; i<n_backtracking; i++){
 			if(loss_s_min < loss_s_max){
 				step_size_max = (step_size_max + step_size_min) / 2
 				loss_s_max = is_a ? loss(a + step_size_max * dir, b) : loss(a, b + step_size_max * dir)
@@ -77,18 +79,22 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 		let max_steps =  2000
 		for(let i = 0; i<max_steps; i++){
 			// gradient step for a
-			let dir_a = - df_da(a,b)
+			let dir_a = df_da(a,b) > 0 ? -1 : 1
 			// console.log(dir_a)
-			let stepsize_a = 0.0005 // 1/n_a 
+			// let stepsize_a = 0.0005 // 1/n_a 
+			let stepsize_a = get_optimal_step_size_a({a,b, dir: dir_a, is_a: true})
 			let step_a = stepsize_a // * dir_a 
 			a = Math.max(a + step_a, 0)
 
 			// gradient step for b
-			let dir_b = - df_db(a,b)
-			let stepsize_b = 0.0005 // 1/n_b
+			let dir_b = df_db(a,b) > 0 ? -1 : 1
+			// let stepsize_b = 0.0005 // 1/n_b
+			let stepsize_b = get_optimal_step_size_a({a,b, dir: dir_b, is_a: false})
 			let step_b = stepsize_b // * dir_b
 			b = Math.max(b + step_b,0)
+			// console.log(`stepsize_a: ${stepsize_a}, stepsize_b: ${stepsize_b}`)
 			// console.log(`a: ${a}, b: ${b}`)
+			if(stepsize_a + stepsize_b < local_minima_indicator) break;
 		}
 		return [a, b]
 	}
@@ -98,7 +104,7 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 	let best_loss = Infinity
 	let best_result = null
 	// for(let i=0; i<num_initializations; i++){
-	while(best_loss > 0.001){
+	while(best_loss >  0.0045){
 		let a_init = Math.random() * 5
 		let b_init = Math.random() * 5
 		let new_result = gradient_descent(a_init, b_init)
