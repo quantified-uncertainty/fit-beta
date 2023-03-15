@@ -17,23 +17,24 @@ console.log(beta_cdf({x: 0.1, a: 1.0, b:25.0}))
 const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 
 	const f_to_minimize = (a,b) => {
-		loss_ci_lower = (beta_cdf(ci_lower, a, b) - 0.05)**2 
-		loss_ci_upper = (beta_cdf(ci_upper, a, b) - 0.95)**2
-		loss = loss_ci_lower + loss_ci_upper
+		let loss_ci_lower = (beta_cdf(ci_lower, a, b) - 0.05)**2 
+		let loss_ci_upper = (beta_cdf(ci_upper, a, b) - 0.95)**2
+		let loss = loss_ci_lower + loss_ci_upper
 		return loss
 	}
 	
 	const h = 2**(-14)
 	const df_da = (a,b) => { // derivative of f with respect to a, at (a,b)
-		f_h = f_to_minimize(a + h, b)
-		f = f_to_minimize(a,b)
-		result = (f_h - f)/h
+		let f_h = f_to_minimize(a + h, b)
+		let f = f_to_minimize(a,b)
+		let result = (f_h - f)/h
 		return result
 	}
 	const df_db = (a,b) => { // derivative of f with respect to b, at (a,b)
-		f_h = f_to_minimize(a,b)
-		f = f_to_minimize(a,b)
-		result = (f_h - f)/h
+		let f_h = f_to_minimize(a, b)
+		let f = f_to_minimize(a, b+h)
+		let result = (f_h - f)/h
+		console.log(result)
 		return result
 	}
 
@@ -61,8 +62,9 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 	}
 	return [a, b]
 }
-	ci_lower = 0.2
-	ci_upper = 0.9
+
+let ci_lower = 0.2
+let ci_upper = 0.9
 
 let result = find_beta_from_ci({ci_lower, ci_upper})
 console.log(result)
