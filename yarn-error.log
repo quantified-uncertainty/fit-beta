@@ -1,0 +1,36 @@
+Arguments: 
+  /home/loki/.nsnvm/node-v16.18.1-linux-x64/bin/node /home/loki/.yarn/bin/yarn.js add @stdlib/math/base
+
+PATH: 
+  /home/loki/.local/bin:/home/loki/.yarn/bin:/home/loki/.config/yarn/global/node_modules/.bin:/home/loki/.bun/bin:/home/loki/.local/bin:/home/loki/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/texlive/2021/bin/x86_64-linux:/home/loki/.cargo/bin:/home/loki/.deno/bin:/usr/local/texlive/2021/bin/x86_64-linux:/home/loki/.yarn/bin:/home/loki/.config/yarn/global/node_modules/.bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.18.1
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@stdlib%2fmath/base: Request "https://registry.yarnpkg.com/@stdlib%2fmath/base" returned a 405
+      at Request.params.callback [as _callback] (/home/loki/.yarn/lib/cli.js:66154:18)
+      at Request.self.callback (/home/loki/.yarn/lib/cli.js:140890:22)
+      at Request.emit (node:events:513:28)
+      at Request.<anonymous> (/home/loki/.yarn/lib/cli.js:141862:10)
+      at Request.emit (node:events:513:28)
+      at IncomingMessage.<anonymous> (/home/loki/.yarn/lib/cli.js:141784:12)
+      at Object.onceWrapper (node:events:627:28)
+      at IncomingMessage.emit (node:events:525:35)
+      at endReadableNT (node:internal/streams/readable:1358:12)
+      at processTicksAndRejections (node:internal/process/task_queues:83:21)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

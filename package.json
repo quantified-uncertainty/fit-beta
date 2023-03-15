@@ -1,8 +1,5 @@
 {
-	"type": "module",
-	"dependencies": {
-		"@stdlib/math": "^0.0.11",
-		"fmin": "^0.0.2",
-		"optimization-js": "^1.5.0"
-	}
+  "dependencies": {
+    "@stdlib/math": "^0.0.11"
+  }
 }
