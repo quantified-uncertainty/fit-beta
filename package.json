@@ -1,4 +1,10 @@
 {
+  "name": "fit-beta",
+  "version": "0.1",
+  "description": "Find a beta distribution which fits a confidence interval",
+  "main": "src/index.js",
+  "author": "NunoSempere <nuno.sempere@protonmail.com>",
+  "license": "MIT, but see src/nelderMead/LICENSE",
   "type": "module",
   "dependencies": {
     "@stdlib/math-base-special-betainc": "^0.0.6"
