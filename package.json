@@ -1,6 +1,6 @@
 {
   "name": "fit-beta",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Find a beta distribution which fits a confidence interval",
   "main": "src/index.js",
   "author": "NunoSempere <nuno.sempere@protonmail.com>",
