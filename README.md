@@ -17,4 +17,40 @@ For various functions, I am using [stdlib](https://stdlib.io/). I tried to extra
 
 ## Installation
 
-For now, I am not publishing this on npm 
+```
+yarn add fit-beta
+# npm install fit-beta
+```
+
+## Usage
+
+### Usage in Javascript
+
+Set `"type": "module",` in your package json, then:
+
+```js
+import {find_beta_from_ci} from 'fit-beta'
+
+let result1 = find_beta_from_ci({ci_lower: 0.3, ci_upper: 0.8})
+console.log(result1)
+
+```
+
+### Usage in other languages
+
+- R: See [here](./src/R/beta.R)
+- Python: to do.
+
+## To do
+
+- [ ] Add test coverage
+- [ ] Add a frontend to this
+- [ ] ...
+
+## Contributions
+
+Contributions are welcome.
+
+## License
+
+Distributed under the MIT license, except for `src/nelderMead`, which is distributed under the BSD-3-Clause license, which is satisfied by including the BSD-3-Clause license in the `src/nelderMead` folder.
