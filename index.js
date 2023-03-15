@@ -48,7 +48,7 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 	// backtracking line search
 	// <https://en.wikipedia.org/wiki/Backtracking_line_search>
 	// Once we know the direction, how far to go along it?
-	let outer_step_size_max = 0.05
+	let outer_step_size_max = 1
 	let n_backtracking = 20
 	let local_minima_indicator = 2 * outer_step_size_max * (1/(2**n_backtracking))
 	const get_optimal_step_size_a = ({a,b, dir, is_a}) => {
@@ -99,33 +99,45 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 		return [a, b]
 	}
 
-	// Do the gradient step for 10 random starting points.
-	let num_initializations = 30
+	// Do the gradient step until the loss is low enough
 	let best_loss = Infinity
 	let best_result = null
-	// for(let i=0; i<num_initializations; i++){
+	let num_trials = 0 
 	while(best_loss >  0.0045){
 		let a_init = Math.random() * 5
 		let b_init = Math.random() * 5
+		if(num_trials > 40 && best_loss < 0.03){
+			let exploit = Math.random() > 0.5
+			if(exploit){
+				a_init = best_result[0] + Math.random() * 0.1
+				b_init = best_result[0] + Math.random() * 0.1
+			}
+		}
 		let new_result = gradient_descent(a_init, b_init)
 		let new_loss = loss(new_result[0], new_result[1])
 		if( new_loss < best_loss){
-			console.log(`new best loss: ${new_loss}`)
+			console.log("New best")
+			console.group()
+				console.log(new_result)
+				console.log(num_trials)
+				console.log(`loss: ${new_loss}`)
+			console.groupEnd()
 			// let [a,b] = new_result
 			// console.log(beta_cdf({x: ci_lower, a, b}))
 			// console.log(beta_cdf({x: ci_upper, a, b}))
-			console.log(new_result)
 			best_loss = new_loss
 			best_result = new_result
 		}
+		num_trials++
 	}
 	//}
+	console.log(num_trials)
 	console.log(best_loss)
 	return best_result
 }
 
-let ci_lower = 0.2
-let ci_upper = 0.9
+let ci_lower = 0.1
+let ci_upper = 0.2
 
 let [a, b] = find_beta_from_ci({ci_lower, ci_upper})
 console.log([a,b])
