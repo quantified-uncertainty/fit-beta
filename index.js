@@ -1,4 +1,4 @@
-import {nelderMead} from './nelderMead.js';
+import {nelderMead} from './nelderMead/nelderMead.js';
 import betainc from '@stdlib/math-base-special-betainc/lib/index.js'
 
 /*
@@ -18,7 +18,7 @@ const beta_cdf = ({x,a,b}) => betainc(x,a,b)
 // https://www.squiggle-language.com/playground#code=eNqrVirOyC8PLs3NTSyqVLIqKSpN1QELuaZkluQXwURSUtMSS3NKnPNTUpWslJJT0jSSUksSNQz1DHQUjEz1DBQ0dRQM9Aw1lWoBnIcZzA%3D%3D
 */ 
 
-const find_beta_from_ci = ({ci_lower, ci_upper}) => {
+export const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 
 	function loss(x){
 		let a = x[0]
@@ -49,21 +49,42 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 
 		return [df_da, df_db]
 	}
+	
+	// Try a sensible default
+	let x0_init = [ 50, 50 ] 
+	let nelderMead_init = nelderMead(loss, x0_init);
+	let result_init = [nelderMead_init.x[0], nelderMead_init.x[1]]
+	let loss_init = loss(result_init)
+	// console.log(loss_init)
 
-	let x0 = [ 10, 5]
-	let result = nelderMead(loss, x0);
-	return [result.x[0], result.x[1]]
+	if(loss < 10e-8){
+		return result_init
+	}
+	
+	// if the sensible default doesn't work,
+	// try a grid search
+	let min_loss = Infinity
+	let result = null
+	for(let a=1; a<40; a=a+2){
+		for(let b=1; b<40; b=b+2){
+			let x0 = [ a, b ]
+			
+			let nelderMead_output = nelderMead(loss, x0);
+			let new_result = [nelderMead_output.x[0], nelderMead_output.x[1]]
+			let new_loss = loss(new_result)
+
+			if(loss < 10e-8){
+				return new_result
+			}
+
+			if(new_loss < min_loss){
+				min_loss = new_loss
+				result = new_result 
+			}
+		}
+	}
+	// console.log(min_loss)
+	return result 
 	
 }
 
-let ci_lower = 0.3
-let ci_upper = 0.8
-
-let result = find_beta_from_ci({ci_lower, ci_upper})
-console.log(result)
-/* console.log([a,b])
-console.log(`beta(${a}, ${b})`)
-
-console.log(beta_cdf({x: ci_lower, a, b}))
-console.log(beta_cdf({x: ci_upper, a, b}))
-*/

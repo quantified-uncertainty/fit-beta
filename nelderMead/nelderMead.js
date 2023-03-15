@@ -12,7 +12,6 @@ function norm2(a)  {
     return Math.sqrt(dot(a, a));
 }
 
-
 function weightedSum(ret, w1, v1, w2, v2) {
     for (var j = 0; j < ret.length; ++j) {
         ret[j] = w1 * v1[j] + w2 * v2[j];
