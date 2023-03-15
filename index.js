@@ -17,9 +17,11 @@ console.log(beta_cdf({x: 0.1, a: 1.0, b:25.0}))
 const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 
 	const f_to_minimize = (a,b) => {
-		let loss_ci_lower = (beta_cdf(ci_lower, a, b) - 0.05)**2 
-		let loss_ci_upper = (beta_cdf(ci_upper, a, b) - 0.95)**2
+		let loss_ci_lower = (beta_cdf({x: ci_lower, a, b}) - 0.05)**2 
+		let loss_ci_upper = (beta_cdf({x: ci_upper, a, b}) - 0.95)**2
+		console.l
 		let loss = loss_ci_lower + loss_ci_upper
+		// console.log(`loss: ${loss}`)
 		return loss
 	}
 	
@@ -34,7 +36,6 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 		let f_h = f_to_minimize(a, b)
 		let f = f_to_minimize(a, b+h)
 		let result = (f_h - f)/h
-		console.log(result)
 		return result
 	}
 
@@ -42,23 +43,24 @@ const find_beta_from_ci = ({ci_lower, ci_upper}) => {
 	let epsilon = 2**(-14) // 1/16384
 	let n_a = 2
 	let n_b = 2
-	let a = 1
-	let b = 1
-	for(let i = 0; i<2**14; i++){
+	let a = 2.5
+	let b = 3
+	let max_steps = 1000 * 1000
+	for(let i = 0; i<max_steps; i++){
 		// gradient step for a
 		let dir_a = - df_da(a,b)
-		let stepsize_a = 1/n_a 
+		let stepsize_a = 0.001 // 1/n_a 
 		let step_a = stepsize_a * dir_a 
-		a = a + step_a
+		a = Math.max(a + step_a, 0)
 		n_a = n_a + 1
 
 		// gradient step for b
 		let dir_b = - df_db(a,b)
-		let stepsize_b = 1/n_b
+		let stepsize_b = 0.001 // 1/n_b
 		let step_b = stepsize_b * dir_b
-		b = b + step_b
+		b = Math.max(b + step_b,0)
 		n_b = n_b + 1
-
+		// console.log(`a: ${a}, b: ${b}`)
 	}
 	return [a, b]
 }
@@ -68,3 +70,4 @@ let ci_upper = 0.9
 
 let result = find_beta_from_ci({ci_lower, ci_upper})
 console.log(result)
+console.log(`beta(${result[0]}, ${result[1]})`)
