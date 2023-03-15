@@ -1,0 +1,6 @@
+{
+	"type": "module",
+  "dependencies": {
+    "@stdlib/math": "^0.0.11"
+  }
+}
