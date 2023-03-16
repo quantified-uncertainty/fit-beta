@@ -1,11 +1,11 @@
-Extract the parameters for a beta distribution from its 90% confidence interval
-====================
+Fit beta
+========
 
 ## About 
 
-This package provides code for obtaining the parameters of a beta distribution which will make it fit a given 90% confidence interval.
+This package provides code for finding a beta distribution whose confidence interval is the one you desire
 
-Although it is fast in terms of human usage (it takes half a second), it is not recommended for usage inside another project, like Squiggle, because 0.5s here and 0.5s there add up fairly fast. Rather, the code should be called, and the parameters included in the second program.
+~~Although it is fast in terms of human usage (it takes a fifth of a second), it is not recommended for usage inside another project, like Squiggle, because 0.5s here and 0.5s there add up fairly fast. Rather, the code should be called, and the parameters included in the second program.~~ Edit: now it is faster, though convergence is not guaranteed. Mixed feelings about including it in Squiggle.
 
 ## Technical details
 
@@ -44,7 +44,7 @@ console.log(result1)
 ## To do
 
 - [ ] Add test coverage
-- [ ] Add a frontend to this
+- [x] Add a frontend to this
 - [ ] ...
 
 ## Contributions
