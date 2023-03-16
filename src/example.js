@@ -8,3 +8,4 @@ console.log(result2)
 
 let result3 = find_beta_from_ci({ci_lower: 0.001, ci_upper: 0.01, ci_length: 0.90})
 console.log(result3)
+

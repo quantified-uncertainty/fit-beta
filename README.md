@@ -39,7 +39,8 @@ console.log(result1)
 ### Usage in other languages
 
 - R: See [here](./src/R/beta.R)
-- Python: to do.
+- Python: to do?
+- If you are a friend: I'm happy to share an endpoint, i.e., a website url that you can call with the desired confidence intervals and get back the beta parameters. 
 
 ## To do
 
