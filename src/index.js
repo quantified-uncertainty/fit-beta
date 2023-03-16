@@ -17,7 +17,7 @@ const beta_cdf = ({x,a,b}) => betainc(x,a,b)
 // should be ~0.928
 // https://www.squiggle-language.com/playground#code=eNqrVirOyC8PLs3NTSyqVLIqKSpN1QELuaZkluQXwURSUtMSS3NKnPNTUpWslJJT0jSSUksSNQz1DHQUjEz1DBQ0dRQM9Aw1lWoBnIcZzA%3D%3D
 */ 
-
+const VERBOSE = false;
 export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
   ci_length = (ci_length > 0 && ci_length < 1) ? (ci_length || 0.9) : 0.9
 	ci_length = ci_length > 0.5 ? ci_length : 1 - ci_length 
@@ -54,14 +54,27 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 	}
 	
 	// Try a sensible default
-	let x0_init = [ 50, 50 ] 
+	let x0_init = [ 1, 1 ] 
 	let nelderMead_init = nelderMead(loss, x0_init);
 	let result_init = [nelderMead_init.x[0], nelderMead_init.x[1]]
 	let loss_init = loss(result_init)
 	// console.log(loss_init)
 
-	if(loss < 10e-8){
+	if(loss_init < 10e-8){
+		if(VERBOSE) console.log("Found in first guess")
 		return result_init
+	}
+
+	// Try another sensible default
+	let x0_init_2 = [ 50, 50 ] 
+	let nelderMead_init_2 = nelderMead(loss, x0_init_2);
+	let result_init_2 = [nelderMead_init_2.x[0], nelderMead_init_2.x[1]]
+	let loss_init_2 = loss(result_init_2)
+	// console.log(loss_init)
+
+	if(loss_init_2 < 10e-8){
+		if(VERBOSE) console.log("Found in second guess")
+		return result_init_2
 	}
 	
 	// if the sensible default doesn't work,
@@ -76,7 +89,8 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 			let new_result = [nelderMead_output.x[0], nelderMead_output.x[1]]
 			let new_loss = loss(new_result)
 
-			if(loss < 10e-8){
+			if(new_loss < 10e-8){
+				if(VERBOSE) console.log(`Found @ a: ${a}, b: ${b}`)
 				return new_result
 			}
 
