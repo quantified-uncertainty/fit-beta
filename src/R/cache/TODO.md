@@ -1,0 +1,2 @@
+- Validate cache errors
+- Integrate into normal function 
