@@ -106,6 +106,7 @@ export const find_beta_from_ci_nelder_mead = ({ci_lower, ci_upper, ci_length}) =
 }
 
 export const find_beta_from_ci_cache = ({ci_lower, ci_upper, ci_length}) => {
+  ci_length = (ci_length > 0 && ci_length < 1) ? (ci_length || 0.9) : 0.9
 	if(ci_length == 0.9 && !!cache[ci_lower] && !!cache[ci_lower][ci_upper]){
 		return cache[ci_lower][ci_upper]
 	} else {
@@ -114,10 +115,13 @@ export const find_beta_from_ci_cache = ({ci_lower, ci_upper, ci_length}) => {
 }
 
 export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
+  ci_length = (ci_length > 0 && ci_length < 1) ? (ci_length || 0.9) : 0.9
   let cache_answer = find_beta_from_ci_cache({ci_lower, ci_upper, ci_length})
 	if(cache_answer != null ){
+		// console.log("Answer in the cache")
 		return cache_answer
 	} else {
+		// console.log("Answer from Nelder Mead")
 		let nelder_mead_answer = find_beta_from_ci_nelder_mead({ci_lower, ci_upper, ci_length})
 		return nelder_mead_answer
 	}
