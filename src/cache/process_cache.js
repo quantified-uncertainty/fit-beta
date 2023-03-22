@@ -22,4 +22,4 @@ for(let i = 0; i<n; i++){
 }
 
 console.log(result_obj)
-fs.writeFileSync("./cache_processed.json", JSON.stringify(result_obj, null, 2))
+fs.writeFileSync("./cache.json", JSON.stringify(result_obj, null, 2))

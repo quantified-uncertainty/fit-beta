@@ -1,6 +1,6 @@
 import {nelderMead} from './nelderMead/nelderMead.js';
 import betainc from '@stdlib/math-base-special-betainc/lib/index.js'
-
+import {cache} from "./cache/cache.js"
 /*
  * Betainc: Incomplete regularized beta function
  * <https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function>
@@ -18,7 +18,7 @@ const beta_cdf = ({x,a,b}) => betainc(x,a,b)
 // https://www.squiggle-language.com/playground#code=eNqrVirOyC8PLs3NTSyqVLIqKSpN1QELuaZkluQXwURSUtMSS3NKnPNTUpWslJJT0jSSUksSNQz1DHQUjEz1DBQ0dRQM9Aw1lWoBnIcZzA%3D%3D
 */ 
 const VERBOSE = false;
-export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
+export const find_beta_from_ci_nelder_Mead = ({ci_lower, ci_upper, ci_length}) => {
   ci_length = (ci_length > 0 && ci_length < 1) ? (ci_length || 0.9) : 0.9
 	ci_length = ci_length > 0.5 ? ci_length : 1 - ci_length 
 	let lower_interval = (1 - ci_length)/2 // e.g, 0.05 for a ci_length of 0.9, or a 90% ci
@@ -105,3 +105,20 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 	
 }
 
+export const find_beta_from_ci_cache = ({ci_lower, ci_upper, ci_length}) => {
+	if(ci_length == 0.9 && !!cache[ci_lower] && !!cache[ci_lower][ci_upper]){
+		return cache[ci_lower][ci_upper]
+	} else {
+		return null
+	}
+}
+
+export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
+  let cache_answer = find_beta_from_ci_cache({ci_lower, ci_upper, ci_length})
+	if(cache_answer != null ){
+		return cache_answer
+	} else {
+		let nelder_mead_answer = find_beta_from_ci_nelder_Mead({ci_lower, ci_upper, ci_length})
+		return nelder_mead_answer
+	}
+}
