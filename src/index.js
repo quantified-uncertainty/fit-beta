@@ -18,7 +18,7 @@ const beta_cdf = ({x,a,b}) => betainc(x,a,b)
 // https://www.squiggle-language.com/playground#code=eNqrVirOyC8PLs3NTSyqVLIqKSpN1QELuaZkluQXwURSUtMSS3NKnPNTUpWslJJT0jSSUksSNQz1DHQUjEz1DBQ0dRQM9Aw1lWoBnIcZzA%3D%3D
 */ 
 const VERBOSE = false;
-export const find_beta_from_ci_nelder_Mead = ({ci_lower, ci_upper, ci_length}) => {
+export const find_beta_from_ci_nelder_mead = ({ci_lower, ci_upper, ci_length}) => {
   ci_length = (ci_length > 0 && ci_length < 1) ? (ci_length || 0.9) : 0.9
 	ci_length = ci_length > 0.5 ? ci_length : 1 - ci_length 
 	let lower_interval = (1 - ci_length)/2 // e.g, 0.05 for a ci_length of 0.9, or a 90% ci
@@ -118,7 +118,7 @@ export const find_beta_from_ci = ({ci_lower, ci_upper, ci_length}) => {
 	if(cache_answer != null ){
 		return cache_answer
 	} else {
-		let nelder_mead_answer = find_beta_from_ci_nelder_Mead({ci_lower, ci_upper, ci_length})
+		let nelder_mead_answer = find_beta_from_ci_nelder_mead({ci_lower, ci_upper, ci_length})
 		return nelder_mead_answer
 	}
 }
