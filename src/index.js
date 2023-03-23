@@ -107,7 +107,7 @@ export const find_beta_from_ci_nelder_mead = ({ci_lower, ci_upper, ci_length}) =
 
 export const find_beta_from_ci_cache = ({ci_lower, ci_upper, ci_length}) => {
   ci_length = (ci_length > 0 && ci_length < 1) ? (ci_length || 0.9) : 0.9
-	if(ci_length == 0.9 && !!cache[ci_lower] && !!cache[ci_lower][ci_upper]){
+	if(ci_length == 0.9 && Object.hasOwn(cache, ci_lower) && Object.hasOwn(cache[ci_lower], ci_upper)){
 		return cache[ci_lower][ci_upper]
 	} else {
 		return null
