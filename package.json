@@ -4,6 +4,10 @@
   "description": "Find a beta distribution which fits a confidence interval",
   "main": "src/index.js",
   "author": "NunoSempere <nuno.sempere@protonmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantified-uncertainty/fit-beta.git"
+  },
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
