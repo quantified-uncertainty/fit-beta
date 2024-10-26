@@ -11,6 +11,6 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@stdlib/math-base-special-betainc": "^0.0.6"
+    "@stdlib/math-base-special-betainc": "^0.2.2"
   }
 }
